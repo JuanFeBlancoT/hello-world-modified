@@ -4,8 +4,10 @@ import java.util.Scanner;
 
 public class Client
 {
+    static Scanner sc = new Scanner(System.in);
     public static void main(String[] args)
     {
+
         java.util.List<String> extraArgs = new java.util.ArrayList<>();
 
         try(com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args,"config.client",extraArgs)) {
@@ -19,6 +21,7 @@ public class Client
                 throw new Error("Invalid proxy");
             }
 
+            //
             String hostname;
             try {
                 //get hostname
@@ -29,42 +32,54 @@ public class Client
             //send hostname
             printer.printString(hostname + " says " + "Hello World!");
 
+
             //FIBONACCI
             boolean menu=false;
 
             while(!menu){
                 String getIpHost=InetAddress.getLocalHost().getHostName();
 
-                System.out.print("_____________________________________INGRESAR OPCION________________________________________________________\n");
-                System.out.print("\n¿Cual opcion desea escoger?");
-                System.out.print("\n");
-                System.out.print("\nEscriba 1, si quiere ingresar un numero para calcular el ultimo numero de la serie de fibonacci");
-                System.out.print("\nEscriba 2, si quiere finalizar el menu");
-                
-                int hostEntraceOption=lector.nextInt();
-                lector.nextLine();
+                //Read input
+                String hostEntraceOption=sc.nextLine();
+                sc.nextLine();
 
-                if(hostEntraceOption==1){
-                    System.out.println("Ingrese el numero: ");
-                    String number = lector.nextLine();
-
-                    String entrance=getIpHost+":"+number;
-                    String message=printer.fibonacciMethod(entrance);
-
+                //Verify if string is numeric
+                boolean isNumeric = verifyNumeric(hostEntraceOption);
+                if(isNumeric){
+                    //Verify ifPositive
+                    int numberChosen = Integer.parseInt(hostEntraceOption);
+                    if(numberChosen > 0){
+                        //FIBO
+                        String entrance = getIpHost+":"+numberChosen;
+                        String message = printer.fibonacciMethod(entrance);
+                        System.out.println(message);
+                    }
+                }else{
+                    //Verify String
+                    if(hostEntraceOption.equalsIgnoreCase("exit")){
+                        menu = true;
+                    }
                 }
-
-                else{
-                    menu=true;
-                    System.out.print("\n");
-                    System.out.print("_____________________________________APLICACION CERRADA____________________________________________________\n");
-                    System.out.print("\n");
-                    break;
-                }
-            }
+            }//End while
         }
         catch(Exception e){
             System.err.println(e);
             System.exit(1);
         }
+    }
+
+    public static boolean verifyNumeric(String input){
+        boolean response = true;
+        if(input==null){
+            response = false;
+        }else{
+            try{
+                Integer chosenNumber = Integer.parseInt(input);
+            } catch (NumberFormatException nfe) {
+                response = false;
+            }
+        }
+
+        return response;
     }
 }
